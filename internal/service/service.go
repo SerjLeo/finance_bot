@@ -2,6 +2,6 @@ package service
 
 func InitService(deps *Dependencies) *Service {
 	return &Service{
-		FinanceService: NewFinanceService(),
+		FinanceService: NewFinanceService(deps.Repo),
 	}
 }

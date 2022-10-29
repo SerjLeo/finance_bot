@@ -1,6 +1,7 @@
 package app
 
 import (
+	"github.com/SerjLeo/finance_bot/internal/repository"
 	"github.com/SerjLeo/finance_bot/internal/service"
 	"github.com/pkg/errors"
 )
@@ -21,13 +22,19 @@ func Run() error {
 		return errors.Wrap(err, "unable to decode into config struct")
 	}
 
-	serviceDeps := &service.Dependencies{}
+	repo := repository.NewRepo()
+
+	serviceDeps := &service.Dependencies{
+		Repo: repo,
+	}
 	service := service.InitService(serviceDeps)
 
-	err = InitRouter(service, config.Bot.Token)
+	router, err := NewRouter(service, config.Bot.Token)
 	if err != nil {
 		return errors.Wrap(err, "cant run bot")
 	}
+
+	router.Listen()
 
 	return nil
 }

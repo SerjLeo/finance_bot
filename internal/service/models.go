@@ -1,18 +1,15 @@
 package service
 
-type Dependencies struct {
-}
+import "github.com/SerjLeo/finance_bot/internal/repository"
 
-type Transaction struct {
-	Id       int64   `json:"id,omitempty"`
-	Amount   float64 `json:"amount"`
-	Currency string  `json:"currency,omitempty"`
-	Type     bool    `json:"type"`
+type Dependencies struct {
+	Repo *repository.Repo
 }
 
 type IFinanceService interface {
-	AddTransaction(amount float64) (Transaction, error)
+	AddTransaction(amount float64) (*repository.Transaction, error)
 	DeleteTransaction(id int64) error
+	GetTransactions() []string
 }
 
 type Service struct {
