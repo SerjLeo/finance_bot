@@ -1,8 +1,8 @@
 package app
 
 import (
-	"fmt"
-	app "github.com/SerjLeo/finance_bot/internal/app/models"
+	"github.com/SerjLeo/finance_bot/internal/service"
+	"github.com/pkg/errors"
 )
 import "github.com/spf13/viper"
 
@@ -10,19 +10,24 @@ func Run() error {
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath("config")
-	err := viper.ReadInConfig() // Find and read the config file
-	if err != nil {             // Handle errors reading the config file
-		fmt.Println(err)
-		return err
+	err := viper.ReadInConfig()
+	if err != nil {
+		return errors.Wrap(err, "errors reading the config file")
 	}
 
-	config := &app.Config{}
+	config := &Config{}
 	err = viper.Unmarshal(config)
 	if err != nil {
-		fmt.Printf("unable to decode into config struct, %v", err)
-		return err
+		return errors.Wrap(err, "unable to decode into config struct")
 	}
 
-	fmt.Printf("%+v", config)
+	serviceDeps := &service.Dependencies{}
+	service := service.InitService(serviceDeps)
+
+	err = InitRouter(service, config.Bot.Token)
+	if err != nil {
+		return errors.Wrap(err, "cant run bot")
+	}
+
 	return nil
 }
